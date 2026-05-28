@@ -1,0 +1,31 @@
+1- The choice between isolated KVM virtual networks for each VLAN and Linux bridges:
+
+Chose LINUX BRIDGES because:
+802.1Q Trunking, Matches Proxmox Mechanics, Cleaner VM Configuration, using only two vNICs.
+
+[ Debian Host Physical NIC ]
+                      │
+             [ vmbr0 (VLAN Filtering) ]
+             ├── Trunk Port (VLANs 10,20,30) ──> OPNsense VM (vtnet1)
+             ├── Access Port (VLAN 10) ────────> linux-srv-02, linux-srv-03
+             ├── Access Port (VLAN 20) ────────> win-srv-01, win-srv-02, win-client-01, linux-client-01
+             └── Access Port (VLAN 30) ────────> linux-srv-01
+
+
+2- Inter-VLAN Firewall Strategy
+
+Chose DEFAULT-DENY inter-VLAN policy because:
+- Follows Zero Trust model: no implicit trust between segments
+- Matches enterprise practice (Thales, Airbus, Capgemini DSI standard)
+- Minimises lateral movement risk if a segment is compromised
+- Forces explicit documentation of every allowed traffic flow
+
+Firewall logic:
+  CORP (VLAN20) → can reach: win-srv-01 (AD/DNS), win-srv-02 (SMB), DMZ web (80/443), WAN (80/443), linux-srv-03 (Bastion)
+  CORP (VLAN20) → blocked from: MGMT segment, direct access to DMZ SSH/admin ports
+  MGMT (VLAN10) → can reach: ALL segments on SSH/ICMP (management plane)
+  MGMT (VLAN10) → blocked from: lateral non-management traffic
+  DMZ  (VLAN30) → can reach: win-srv-01 LDAP (389/636) for Keycloak auth, WAN for updates
+  DMZ  (VLAN30) → blocked from: all other RFC1918 ranges (no lateral movement)
+
+  Admin workstation currently on CORP VLAN, access restricted by alias at firewall level. VLAN40 PAW planned for Week 4 Zero Trust hardening

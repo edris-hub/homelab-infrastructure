@@ -1,0 +1,42 @@
+VLAN10 MGMT 192.168.10.0/24
+VLAN20 CORP 192.168.20.0/24
+VLAN30 DMZ  192.168.30.0/24
+
+OPNsense 4 interfaces:
+int 1:                  WAN:  DHCP
+int 2:                  VLAN: MGMT 10   IP: 192.168.10.1
+Int 3:                  VLAN: CORP 20   IP: 192.168.20.1
+int 4:                  VLAN: DMZ  30   IP: 192.168.30.1
+
+host: win-srv-01:       VLAN:  CORP 20  IP: 192.168.20.10   ROLE: AD/DNS/DHCP/GPO
+host: win-srv-02:       VLAN:  CORP 20  IP: 192.168.20.11   ROLE: File server/Samba
+host: linux-srv-01:     VLAN:  DMZ  30  IP: 192.168.30.10   ROLE: Nginx/Nextcloud/Keycloak
+host: linux-srv-02:     VLAN:  MGMT 10  IP: 192.168.10.10   ROLE: Zabbix + Grafana/Wazuh
+host: linux-srv-03:     VLAN:  MGMT 10  IP: 192.168.10.11   ROLE: Ansible/GLPI/Bastion/rsyslog
+host: win-client-01     VLAN:  CORP 20  IP: 192.168.20.12   ROLE: Windows 11 workstation
+host: linux-client-01:  VLAN:  CORP 20  IP: 192.168.20.13   ROLE: Debian workstation
+
+
+DNS Server: 192.168.20.10 = win-srv-01
+#Using 192.168.20.1 (OPNsense as DNS server until I configure the AD DNS server)
+
+Static range reserved addresses:
+.1             OPNSense (gateway)
+.2 - 9         Reserved for future infrastructure
+.10 - 50       Static assignments
+.100 - 200     DHCP pool
+.201 - 254     Reserved
+
+
+Specs:
+
+win-srv-01:       4GB RAM 60GB
+win-srv-02:       3GB RAM 60GB
+linux-srv-01:     2GB RAM 400GB
+linux-srv-02:     2GB RAM 60GB
+linux-srv-03:     2GB RAM 60GB
+win-client-01:    4GB RAM 60GB
+linux-client-01:  3GB RAM 60GB
+OPNsense:         4GB RAM 60GB
+
+
