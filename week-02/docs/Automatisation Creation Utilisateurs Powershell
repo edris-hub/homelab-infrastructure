@@ -1,0 +1,61 @@
+$DomainDN = "DC=corp,DC=protechcorp,DC=net"
+$CSVPath = "C:\Scripts\user_import.csv"
+$Users = Import-Csv -Path $CSVPath
+
+Import-Module ActiveDirectory
+
+$OUs = @("Utilisateurs", "Ordinateurs", "Serveurs", "Groupes", "Admins")
+
+foreach ($OU in $OUs) {
+    New-ADOrganizationalUnit -Name $OU -Path "$DomainDN" -ErrorAction SilentlyContinue
+}
+
+$ParentOU = "OU=Utilisateurs,$DomainDN"
+$Departments = @("Sales", "IT", "Finance", "HR", "Marketing", "Operations")
+
+foreach ($Dept in $Departments) {
+    New-ADOrganizationalUnit -Name $Dept -Path $ParentOU -ErrorAction SilentlyContinue
+}
+
+
+foreach ($User in $Users) {
+$FirstName = $User.FirstName
+$LastName = $User.LastName
+$Department = $User.Department
+$OUName = $User.OU
+$Title = $User.Title
+$Phone = $User.PhoneNumber
+$Country = $User.Country
+
+$Username = ($FirstName.Substring(0,1) + $LastName).ToLower()
+
+$DisplayName = "$FirstName $LastName"
+$OUPath = "OU=$Department,OU=Utilisateurs,DC=corp,DC=protechcorp,DC=net"
+$Domain = "@corp.protechcorp.net"
+$Email = "$Username$Domain"
+
+$Base = $Username
+$Counter = 2
+
+while (Get-ADUser -Filter "SamAccountName -eq '$Username'" -ErrorAction SilentlyContinue)
+    {$Username = $Base + $Counter
+    $Counter++
+}
+
+New-ADUser `
+-SamAccountName $Username `
+-UserPrincipalName "$Username@corp.protechcorp.net" `
+-Name $DisplayName `
+-GivenName $FirstName `
+-Surname $LastName `
+-DisplayName $DisplayName `
+-EmailAddress $Email `
+-Title $Title `
+-Department $Department `
+-OfficePhone $Phone `
+-Path $OUPath `
+-AccountPassword (ConvertTo-SecureString "Temppass123!" -AsPlainText -Force) `
+-ChangePasswordAtLogon $true `
+-Enabled $true
+
+} 
