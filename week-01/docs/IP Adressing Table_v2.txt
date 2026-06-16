@@ -13,9 +13,11 @@ host: win-srv-02:       VLAN:  CORP 20  IP: 192.168.20.11   ROLE: File server/Sa
 host: linux-srv-01:     VLAN:  DMZ  30  IP: 192.168.30.10   ROLE: Nginx/Nextcloud/Keycloak
 host: linux-srv-02:     VLAN:  MGMT 10  IP: 192.168.10.10   ROLE: Zabbix + Grafana/Wazuh
 host: linux-srv-03:     VLAN:  MGMT 10  IP: 192.168.10.11   ROLE: Ansible/GLPI/Bastion/rsyslog
+host: linux-srv-04:     VLAN:  DMZ  30  IP: 192.168.30.11   ROLE: Mailcow
+host: linux-srv-05      VLAN   MGMT 10  IP: 192.168.10.12   Role:
+Bastion SSH (ProxyJump)
 host: win-client-01     VLAN:  CORP 20  IP: 192.168.20.12   ROLE: Windows 11 workstation
 host: linux-client-01:  VLAN:  CORP 20  IP: 192.168.20.13   ROLE: Debian workstation
-host: linux-srv-04:     VLAN:  DMZ  30  IP: 192.168.30.11   ROLE: Mailcow mail server
 
 
 DNS Server: 192.168.20.10 = win-srv-01
@@ -36,9 +38,10 @@ win-srv-02:       3GB RAM 60GB
 linux-srv-01:     2GB RAM 400GB
 linux-srv-02:     2GB RAM 60GB
 linux-srv-03:     2GB RAM 60GB
+linux-srv-04:     2GB RAM 60GB
+linux-srv-05:     1GB RAM 30GB
 win-client-01:    4GB RAM 60GB
 linux-client-01:  3GB RAM 60GB
 OPNsense:         4GB RAM 60GB
-linux-srv-04:     4GB RAM 60GB
 
 
